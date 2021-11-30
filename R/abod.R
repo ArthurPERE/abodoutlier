@@ -111,17 +111,16 @@ abod <- function(data, method = "complete", n_sample_size = trunc(nrow(data)/10)
     for(i in 1:n){
       # Find k nearest neighbours and subset data
       a = as.numeric(data[i, ])
-      selected_indexes = sort(as.numeric(distances[i, ]), decreasing = T, index.return = TRUE)$ix[2:(k+1)]
+      selected_indexes = sort(as.numeric(distances[i, ]), index.return = TRUE)$ix[2:(k+1)]
       selected_data = data[selected_indexes, ]
-      index = 1
       angles = c()
-      for(j in 1:k){
+      for(j in 1:(k-1)){ # the -1 to prevent the other loop to have a k + 1
         b = as.numeric(selected_data[j, ])
         if(identical(a, b)){
           next
         }
-        for(k in 1:k){
-          c = as.numeric(selected_data[k, ])
+        for(l in (j+1):k){ # to remove that the same angle is computed twice and change variable k to l
+          c = as.numeric(selected_data[l, ])
           if(identical(a, c) | identical(b, c)){
             next
           }
@@ -133,8 +132,7 @@ abod <- function(data, method = "complete", n_sample_size = trunc(nrow(data)/10)
           dot_prod = sum(ab * ac)
           
           # Compute angle between vertice i, points j, k. Store it.
-          angles = c(angles, dot_prod/(norm_ab * norm_ac))
-          index = index + 1            
+          angles = c(angles, dot_prod/(norm_ab * norm_ac))      
         }
       }
       aprox_abof[i] = var(angles)
